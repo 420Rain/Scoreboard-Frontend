@@ -1,29 +1,33 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const url = request.nextUrl.pathname;
 
-  // better-auth typically sets a cookie that includes "session_token"
-  const allCookies = request.cookies.getAll();
+  const isLoginPage = url === "/login";
 
-  console.log("=== MIDDLEWARE RAN FOR:", url, "===");
-  console.log("COOKIES FOUND:", allCookies.map(c => c.name));
-  const hasSession = allCookies.some(cookie => cookie.name.includes('session_token'));
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/get-session`, {
+      headers: {
+        cookie: request.headers.get("cookie") || "",
+      },
+    });
 
-  const isLoginPage = url === '/login';
+    const isAuthenticated = res.ok;
 
-  if (!hasSession && !isLoginPage) {
-    console.log("no");
-    return NextResponse.redirect(new URL('/login', request.url));
+    if (!isAuthenticated && !isLoginPage) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+
+    if (isAuthenticated && isLoginPage) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+
+    return NextResponse.next();
+  } catch (err) {
+    console.error("Auth check failed:", err);
+    return NextResponse.redirect(new URL("/login", request.url));
   }
-
-  if (hasSession && isLoginPage) {
-    console.log("good");
-    return NextResponse.redirect(new URL('/', request.url)); 
-  }
-
-  return NextResponse.next();
 }
 
 export const config = {

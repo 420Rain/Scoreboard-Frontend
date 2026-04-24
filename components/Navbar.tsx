@@ -19,9 +19,22 @@ export default function Navbar() {
     };
   }, []);
 
-  const handleLogout = () => {
-    alert("Logging out...");
-    setIsOpen(false);
+  const handleLogout = async () => {
+    try {
+      const res = await fetch("/api/sign-out", {
+        method: "POST",
+      });
+
+      if(!res.ok){
+        throw new Error("Logout failed");
+      }
+
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      setIsOpen(false);
+    }
   };
 
   return (

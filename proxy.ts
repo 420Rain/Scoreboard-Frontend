@@ -7,13 +7,16 @@ export async function proxy(request: NextRequest) {
   const isLoginPage = url === "/login";
 
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/get-session`, {
+    const res = await fetch(`${process.env.BACKEND_URL}/api/auth/get-session`, {
       headers: {
         cookie: request.headers.get("cookie") || "",
       },
+      cache: "no-store",
     });
 
-    const isAuthenticated = res.ok;
+    const data = await res.json();
+
+    const isAuthenticated = data !== null;
 
     if (!isAuthenticated && !isLoginPage) {
       return NextResponse.redirect(new URL("/login", request.url));

@@ -51,24 +51,15 @@ export default function RankingList (){
   useEffect(() => {
     const fetchTop10 = async () => {
       try {
-        // Option A: If your backend allows CORS from your frontend
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/scores/top`);
-        
-        // Option B: If you get CORS errors, you'll need to create an app/api/scores/top/route.ts proxy 
-        // and fetch from '/api/scores/top' instead!
+        const res = await fetch("/api/scores");
 
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
         }
 
         const data = await res.json();
-        
-        // 1. Inspect the data in your browser console
-        console.log("Backend response:", data); 
 
-        // 2. Once you confirm the data structure matches your Member interface, 
-        // uncomment the line below to actually update the UI!
-        // setMembers(data);
+        setMembers(data);
 
       } catch (error) {
         console.error("Failed to fetch leaderboard:", error);
@@ -109,19 +100,3 @@ export default function RankingList (){
     </div>
   )
 }
-
-// export async function buildLoginUrl() {
-//   // Build a URL that the *browser* can open directly.
-//   // We cannot use the Better‑Auth POST endpoint here because a plain GET link would result in a 404.
-//   // Instead we point to a lightweight GET route (/api/auth/login) that renders a tiny HTML form
-//   // which auto‑submits a POST to Better‑Auth’s sign‑in/social endpoint.
-//   // This preserves the required cookie (state) and lets the flow work entirely in the browser.
-
-//   const baseUrl =
-//     process.env.BETTER_AUTH_URL ||
-//     process.env.APP_URL ||
-//     "http://localhost:3000";
-//   const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
-//   const callbackUrl = encodeURIComponent(frontendUrl + "/");
-//   return `${baseUrl}/api/auth/login?provider=google&callbackURL=${callbackUrl}`;
-// }

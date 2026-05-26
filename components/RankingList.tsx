@@ -47,10 +47,15 @@ const getRankStyles = (rank: number) => {
 
 export default function RankingList (){
   const[members, setMembers] = useState<Member[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchTop10 = async () => {
       try {
+        setIsLoading(true);
+        setError(null);
+
         const res = await fetch("/api/scores");
 
         if (!res.ok) {
@@ -59,15 +64,48 @@ export default function RankingList (){
 
         const data = await res.json();
 
+        console.log("Backend Data: ", data);
+
         setMembers(data);
 
       } catch (error) {
         console.error("Failed to fetch leaderboard:", error);
+        setError("Failed to load the scoreboard. Please try again later.");
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchTop10();
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-12">
+        <p className="text-gray-500 font-poppins text-lg animate-pulse">
+          Loading leaderboard...
+        </p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-10 px-4 text-center bg-red-50 rounded-lg border border-red-200 shadow-sm">
+        <p className="text-red-500 font-poppins text-lg font-semibold mb-1">Oops!</p>
+        <p className="text-red-400 font-poppins text-sm md:text-base">{error}</p>
+      </div>
+    );
+  }
+
+  if (members.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 px-4 text-center bg-gray-50 rounded-lg border border-gray-200 border-dashed shadow-sm">
+        <p className="text-gray-500 font-poppins text-lg font-semibold mb-1">No scores yet</p>
+        <p className="text-gray-400 font-poppins text-sm md:text-base">Be the first to get on the board!</p>
+      </div>
+    );
+  }
 
   return(
     <div className="flex flex-col gap-5">

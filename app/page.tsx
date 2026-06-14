@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import RankingList from "@/components/RankingList";
+import UserCard from "@/components/UserCard";
 
 export default function HomePage() {
   return (
@@ -12,13 +13,8 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 gap-14 justify-center items-start lg:grid-cols-[1fr_2fr]">
             <div className="flex flex-col gap-8">
-              <div className="p-4 flex flex-col justify-between bg-gray-100 rounded-lg gap-6 shadow-md border-3 border-gray-300 font-poppins font-semibold text-gray-900">
-                <div className="flex flex-col gap-0.5">
-                  <p className="text-3xl">Name</p>
-                  <p className="text-lg text-gray-500">ID Number</p>
-                </div>
-                <p className="text-xl">Points:</p>
-              </div>
+
+              <UserCard />
 
               <div className="lg:flex flex-col mx-auto text-center hidden lg:text-left font-poppins">
                 <p className="font-semibold text-3xl">Climb the Ranks & Earn Rewards</p>

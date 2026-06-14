@@ -5,7 +5,7 @@ import { useState, useEffect } from "react"
 interface Member {
   id: string;
   name: string;
-  points: number;
+  score: number;
 }
 
 const getRankStyles = (rank: number) => {
@@ -129,7 +129,7 @@ export default function RankingList (){
                 </p>
               </div>
               <p className="text-gray-600 text-xl font-semibold text-shadow-sm font-lexend">
-                {member.points}
+                {member.score}
               </p>
             </div>
           </div>

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {
-    const response = await fetch(`${process.env.BACKEND_URL}/api/scores/top`, {
+    const response = await fetch(`${process.env.BACKEND_URL}/api/scores`, {
       method: "GET",
       headers: {
         "x-api-key": process.env.API_SECRET || "",

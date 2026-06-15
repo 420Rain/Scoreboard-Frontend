@@ -1,6 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface Member {
   id: string;
@@ -50,6 +58,9 @@ export default function RankingList (){
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
   useEffect(() => {
     const fetchTop10 = async () => {
       try {
@@ -63,8 +74,6 @@ export default function RankingList (){
         }
 
         const data = await res.json();
-
-        console.log("Backend Data: ", data);
 
         setMembers(data);
 
@@ -107,10 +116,17 @@ export default function RankingList (){
     );
   }
 
+  const totalPages = Math.ceil(members.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentMembers = members.slice(startIndex, startIndex + itemsPerPage);
+
+  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
+
   return(
+  <div className="flex flex-col gap-8 w-full">
     <div className="flex flex-col gap-5">
-      {members.map((member, index) => {
-        const rank = index + 1;
+      {currentMembers.map((member, index) => {
+        const rank = startIndex + index + 1;
         const styles = getRankStyles(rank);
 
         return (
@@ -135,6 +151,47 @@ export default function RankingList (){
           </div>
         );
       })}
+    </div>
+
+    {totalPages > 1 && (
+      <div className="mt-4 bg-white/60 p-3 rounded-xl border border-gray-200 shadow-sm">
+        <Pagination>
+          <PaginationContent className="font-poppins">
+            
+            <PaginationItem className="mr-4 md:mr-8"> 
+              <PaginationPrevious 
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                className={`cursor-pointer hover:bg-gray-100 hover:text-gray-900 transition-colors ${currentPage === 1 ? 'pointer-events-none opacity-50' : ''}`}
+              />
+            </PaginationItem>
+
+            {pageNumbers.slice(0, 3).map((page) => (
+              <PaginationItem key={page}>
+                <PaginationLink 
+                  onClick={() => setCurrentPage(page)}
+                  isActive={currentPage === page}
+                  className={`cursor-pointer transition-all duration-200 ${
+                    currentPage === page 
+                      ? "bg-lscs-blue text-white hover:bg-lscs-blue hover:text-white shadow-md font-bold" 
+                      : "hover:bg-gray-100 text-gray-600"
+                  }`}
+                >
+                  {page}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+
+            <PaginationItem className="ml-4 md:ml-8">
+              <PaginationNext 
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                className={`cursor-pointer hover:bg-gray-100 hover:text-gray-900 transition-colors ${currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}`}
+              />
+            </PaginationItem>
+            
+          </PaginationContent>
+        </Pagination>
+      </div>
+    )}
     </div>
   )
 }
